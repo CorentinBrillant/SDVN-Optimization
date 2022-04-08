@@ -2,10 +2,13 @@
 
 import numpy as np
 
+def softmax(x):
+    return np.exp(x) / np.sum(np.exp(x), axis=0)
+
 def generateRandomPop(N,d):
 	P = []
 	for i in range(N):
-		P.append((np.random.rand(d) > 0.5).astype(int))
+		P.append(np.random.rand(d))
 	return P
 
 def computeLatency(X):
@@ -40,14 +43,14 @@ def VBO():
 	L = [computeLatency(x) for x in P]
 	next_L = [x for x in L]
 	indexSort = sorted(range(len(L)), key=lambda k: L[k])
-	cou = 10
+	cou = 100
 	while not critereArret() and cou>0:
 		cou -= 1
 		Xbest = P[indexSort[0]]
 		Xworst = P[indexSort[-1]]
 		for i in range(Na):
 			ra = (np.random.rand(d) > 0.5).astype(int)
-			next_P[indexSort[i]] = P[indexSort[i]] + ra * ([a-b for (a,b) in zip(Xbest,Xworst)])
+			next_P[indexSort[i]] = softmax(P[indexSort[i]] + ra * ([a-b for (a,b) in zip(Xbest,Xworst)]))
 		for i in range(Na,N):
 			i_peer = np.random.randint(N)
 			while (i_peer == i):
@@ -56,11 +59,11 @@ def VBO():
 			latency_peer = L[indexSort[i_peer]]
 			latency_X = L[indexSort[i]]
 			if latency_X < latency_peer:
-				next_P[indexSort[i]] = P[indexSort[i]] + c1 * rb * ([a-b for (a,b) in zip(Xbest,P[indexSort[i_peer]])])
+				next_P[indexSort[i]] = softmax(P[indexSort[i]] + c1 * rb * ([a-b for (a,b) in zip(Xbest,P[indexSort[i_peer]])]))
 			elif latency_X > latency_peer:
-				next_P[indexSort[i]] = P[indexSort[i]] + c2 * rb * ([a-b for (a,b) in zip(P[indexSort[i_peer]],P[indexSort[i]])])
+				next_P[indexSort[i]] = softmax(P[indexSort[i]] + c2 * rb * ([a-b for (a,b) in zip(P[indexSort[i_peer]],P[indexSort[i]])]))
 			else:
-				next_P[indexSort[i]] = 2 * rb * P[indexSort[i]]
+				next_P[indexSort[i]] = softmax(2 * rb * P[indexSort[i]])
 		next_L = [computeLatency(x) for x in next_P]
 		for i in range(N):
 			if next_L[i] < L[i]:
@@ -69,4 +72,37 @@ def VBO():
 		indexSort = sorted(range(len(L)), key=lambda k: L[k])
 	return P[indexSort[0]], L[indexSort[0]]
 
-print(VBO())
+#print(VBO())
+
+def dominate(O, idx_x_1, idx_x_2):
+	dom = True
+	for i in range(len(O)):
+		dom = dom and (O[i][idx_x_1] > O[i][idx_x_2])
+	return dom
+
+def nonDominatedSet(X, objList):
+	O = []
+	for i in range(len(objList)):
+		O.append([objList[i](x) for x in X])
+
+	P = popCopy(X)
+	S = []
+	while len(P)>0:
+		F_i = []
+		F = []
+		for i in range(len(P)):
+			if len(list(filter(lambda x: dominate(O, x, i), range(len(P)))))<= 0:
+				F_i.append(i)
+		for x in F_i[::-1]:
+			F.append(P.pop(x))
+			for i in range(len(O)):
+				O[i].pop(x)
+		S.append(F)
+	return S
+	"""
+	C = [len(x) for x in S]
+	return C
+	"""
+
+print(nonDominatedSet(generateRandomPop(50,10),[computeLatency]))
+
