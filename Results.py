@@ -60,7 +60,7 @@ def particleToObjects(vect):
 
 	# on calcule les 4 objectifs 
 	values = []
-	#values.append(clockSync(RSUs, voitures))
+	values.append(clockSync(RSUs, voitures))
 	values.append(nbControleurs(RSUs))
 	values.append(latency(RSUs, voitures))
 	values.append(equiCharge(RSUs, voitures))

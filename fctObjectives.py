@@ -156,7 +156,7 @@ def latency(rs, vs):
     lat = 0 
     for i in range(nbRsu):
         for j in range(nbRsu):
-            if rs[i].cAtr == j:
+            if rs[i].cAtr == j or (rs[i].isCont and i==j):
                 rs[i].calcCoef(vs,rs)
                 lat = lat +((C - D[i,j])*rs[i].coef)
     return lat

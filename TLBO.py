@@ -142,11 +142,17 @@ def MOTLBO():
     cou = 100
     P_p = popCopy(P)
     while not critereArret() and cou>0:
+        #Teacher Phase
         cou=-1
+        
+#        On recupere un X en faisant la moyenne et on prend le meilleur X
         Xmean = list(np.mean(P,axis=0))
         Xbest = P[0]
         r = (np.random.rand(d) > 0.5).astype(int)
+        
+        #facteur d'apprentissage ( Teaching Factor)
         TF = randrange(1)+1
+        
         for i in range(N):
             P_p[i] = P[i] + r * ([a - b for a,b in zip(Xbest,TF*Xmean)])
 
@@ -156,6 +162,8 @@ def MOTLBO():
                 P[i] = P_p[i]
                 O[i] = O_p[i]
         r_s = (np.random.rand(d) > 0.5).astype(int)
+        
+        #Student phase
         for i in range(N):
             i_peer = np.random.randint(N)
             while (i_peer == i):
