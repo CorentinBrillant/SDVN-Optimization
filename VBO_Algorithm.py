@@ -124,7 +124,6 @@ def nonDominatedSet(X, O):
 		# puis on le retire de la population 
 		for x in F_i[::-1]:
 			F.append(P.pop(x))
-			O.pop(x)
 
 		# on rajoute ce groupe à la suite de la liste S qui contient les groupes d'invidus classés par ordre de dominance
 		S.append(F)
