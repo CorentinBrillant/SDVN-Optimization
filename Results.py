@@ -6,7 +6,7 @@ import numpy as np
 
 mapWidth = 7000
 mapHeight= 6000
-nbVoitures = 100
+nbVoitures = 500
 
 #Initialisation des RSUs
 RSUs = []
