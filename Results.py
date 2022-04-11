@@ -68,4 +68,4 @@ def particleToObjects(vect):
 	return values
 
 
-print(particleToObjects((np.random.rand(24) > 0.5).astype(int)))
+#print(particleToObjects((np.random.rand(24) > 0.5).astype(int)))

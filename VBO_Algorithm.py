@@ -1,6 +1,7 @@
 #coding:utf-8
 
 import numpy as np
+from Results import *
 
 def softmax(x):
     return np.exp(x) / np.sum(np.exp(x), axis=0)
@@ -86,31 +87,18 @@ def VBO():
 
 #print(VBO())
 
-# objList : la liste des objectifs à minimiser
-# i_1, i_2 : les deux individus, donc deux vecteurs avec des valeurs entre 0 et 1 
-def dominate_aux(objList, i_1, i_2):
-	dom = True
-	for obj in objList:
-		dom = dom and (obj(i_1) < obj(i_2))
-	return dom
-
 # Pour une population donnée, on considère O un tableau regroupant les valeurs de chaque individu pour chaque fonction objectif
 # Soient idx_x_1 et idx_x_2, les deux indices de deux individus de la population. On veut savoir si idx_x_1 domine idx_x_2.
-def dominate(O, idx_x_1, idx_x_2):
+def dominate(O_1, O_2):
 	dom = True
-	for i in range(len(O)):
+	for i in range(len(O_1)):
 		# Vrai si l'individu idx_x_1 domine l'individu idx_x_2 selon l'objectif i, on veut minimiser l'objectif
-		dom = dom and (O[i][idx_x_1] < O[i][idx_x_2])
+		dom = dom and (O_1[i] < O_2[i])
 	return dom
 
 # une fonction qui retourne la population triée par ordre de dominance, des individus non dominés entre eux appartiennent au même groupe au sein de la population.
-# X une population, objList la liste des objectifs à optimiser
-def nonDominatedSet(X, objList):
-
-	# on calcule les valeurs de chaque individu selon tous les objectifs 
-	O = []
-	for i in range(len(objList)):
-		O.append([objList[i](x) for x in X])
+# X une population, O la liste des 4 objectifs pour chaque particule
+def nonDominatedSet(X, O):
 
 	# on effectue une copie de la population car on va trier les individus par groupe de dominance
 	P = popCopy(X)
@@ -121,18 +109,18 @@ def nonDominatedSet(X, objList):
 		# on crée un ss-groupe de non-dominés entre eux
 		F_i = []
 		F = []
+
 		#sur l'ensemble des individus 
 		for i in range(len(P)):
 			#s'il existe des individus non-dominés par aucun autre individu de la population restante
-			if len(list(filter(lambda x: dominate(O, x, i), range(len(P)))))<= 0:
+			if len(list(filter(lambda x: dominate(O[x], O[i]), range(len(P)))))<= 0:
 				# on le rajoute dans le groupe F_i
 				F_i.append(i)
 
 		# puis on le retire de la population 
 		for x in F_i[::-1]:
 			F.append(P.pop(x))
-			for i in range(len(O)):
-				O[i].pop(x)
+			O.pop(x)
 
 		# on rajoute ce groupe à la suite de la liste S qui contient les groupes d'invidus classés par ordre de dominance
 		S.append(F)
@@ -150,17 +138,27 @@ def MOVBO():
 	objList = [computeLatency]
 	c1, c2 = 1.5, 1.25 #recommanded 
 	N = 100 # population size
-	d = 10 # num of RSUs
+	d = 24 # num of RSUs
 	alpha = 0.1 # proportion class A
 	Na = int(alpha*N) #nb d'individus dans la classe A
-	Alea_P = generateRandomPop(N,d)
-	P = sum(nonDominatedSet(Alea_P,objList),[]) # on trie la population par groupes de dominance puis on "flatten" les groupes pour récupérer les individus de la classe A.
-	O = []
-	for i in range(len(objList)):
-		O.append([objList[i](x) for x in P])
-	next_P = [[x for x in particle] for particle in P] # Prochaine génération
+	Alea_P = generateRandomPop(N,d) #on génère une population aléatoire
 
-	cou = 100
+	# on calcule les fonctions objectifs pour chaque particule
+	O = []
+	for i in range(len(Alea_P)):
+		O.append([particleToObjects(x) for x in Alea_P])
+
+	# on trie la population par groupes de dominance puis on "flatten" les groupes pour récupérer les individus de la classe A.
+	P = sum(nonDominatedSet(Alea_P, O),[]) 
+
+	# on calcule les fonctions objectifs pour chaque particule
+	O = []
+	for i in range(len(P)):
+		O.append([particleToObjects(x) for x in P])
+
+	next_P = [[x for x in particle] for particle in P] # la prochaine génération
+	print("coucou")
+	cou = 1
 	while not critereArret() and cou>0:
 		cou -= 1
 
@@ -181,8 +179,8 @@ def MOVBO():
 			rb = (np.random.rand(d) > 0.5).astype(int)
 
 			# on regarde les rapports de dominance entre le i-ème et le i_peer-ème individu
-			i_dom_i_peer = dominate(O, i, i_peer)
-			i_peer_dom_i = dominate(O, i_peer, i)
+			i_dom_i_peer = dominate(O[i], O[i_peer]) # Vrai si i domine i_peer
+			i_peer_dom_i = dominate(O[i_peer], O[i]) # Vrai si i_peer domine i
 			if i_dom_i_peer:
 				next_P[i] = softmax(P[i] + c1 * rb * ([a-b for (a,b) in zip(Xbest,P[i_peer])]))
 			elif i_peer_dom_i:
@@ -192,22 +190,24 @@ def MOVBO():
 
 		# on recalcule les fonctions objectifs pour chaque nouvel individu de next_P
 		next_O = []
-		for i in range(len(objList)):
-			next_O.append([objList[i](x) for x in next_P])
+		for i in range(len(next_P)):
+			next_O.append([particleToObjects(x) for x in next_P])
 
 		# on applique les maj de chaque individu uniquement sa nouvelle position domine l'ancienne
 		for i in range(N):
-			if dominate_aux(objList, P[i], next_P[i]):
+			if dominate(next_O[i], O[i]):
 				P[i] = [x for x in next_P[i]]
-				for j in range(len(objList)):
-					O[j][i] = next_O[j][i]
+				O[i] = next_O[i]
 
 		# et on trie de nouveau la population par ordre de dominance
-		P = sum(nonDominatedSet(P,objList),[])
-		for i in range(len(objList)):
-			O.append([objList[i](x) for x in P])
+		P = sum(nonDominatedSet(P, O),[])
+		
+		# on calcule les fonctions objectifs pour chaque particule
+		O = []
+		for i in range(len(P)):
+			O.append([particleToObjects(x) for x in P])
 
 	# si on a atteint le critère d'arrêt, on renvoie le meilleur individu et sa valeur
-	return P[0]
+	return P[0], O[0]
 
 print(MOVBO())
