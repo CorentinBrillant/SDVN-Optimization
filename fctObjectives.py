@@ -46,7 +46,9 @@ class Voiture:
     def attrClosestRsu(self, RSUs):
         for rsu in RSUs:
             if self.attrRsu(rsu)==1:
-                break
+                return 1
+        return 0
+
 
     def printVoiture(self):
         print("h = ",self.h.second)

@@ -6,7 +6,7 @@ import numpy as np
 
 mapWidth = 7000
 mapHeight= 6000
-nbVoitures = 1000
+nbVoitures = 100
 
 #Initialisation des RSUs
 RSUs = []
@@ -19,18 +19,13 @@ for i in range(5):
 				RSUs.append(Rsu(600+j*1100,600+i*1100,datetime.now(),0))
 
 # Initialisation des voitures    
-voitures_tmp = []
-for i in range(nbVoitures):
-    voitures_tmp.append(Voiture(datetime.now(),randrange(14)))
-
-# attribution des RSUs aux véhicules
-for v in voitures_tmp:
-	v.attrClosestRsu(RSUs)
-
-# on ne prend en compte que les véhicules à portée d'un RSU
 voitures = []
-for v in voitures_tmp:
-	if v.rsuAtr in range(24):
+while len(voitures)<nbVoitures:
+	v = Voiture(datetime.now(),randrange(14))
+
+	# on ne prend en compte que les véhicules à portée d'un RSU
+	# attribution des RSUs aux véhicules
+	if v.attrClosestRsu(RSUs):
 		voitures.append(v)
 
 # affectation des RSUs non contrôleurs aux RSUs contrôleurs

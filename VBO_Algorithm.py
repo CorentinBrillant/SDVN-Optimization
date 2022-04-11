@@ -139,7 +139,9 @@ def nonDominatedSet(X, O):
 def MOVBO():
 
 	c1, c2 = 1.5, 1.25 #recommanded 
-	N = 100 # population size
+	N = 10 # population size
+	#N = 50 # population size
+	#N = 100 # population size
 	d = 24 # num of RSUs
 	alpha = 0.1 # proportion class A
 	Na = int(alpha*N) #nb d'individus dans la classe A
@@ -203,10 +205,6 @@ def MOVBO():
 
 	# si on a atteint le critère d'arrêt, on renvoie le meilleur individu et sa valeur
 
-	l = len(nonDominatedSet(P, O)[0])
-	O = [particleToObjects(discretise(x)) for x in P]
-	print(l)
-	return P[:l],O[:]
-	#return P[0], O[0]
+	return discretise(P[0]), O[0]
 
-MOVBO()
+print(MOVBO())
