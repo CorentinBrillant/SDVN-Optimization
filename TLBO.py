@@ -131,7 +131,6 @@ def MOTLBO():
     Alea_P = generateRandomPop(N,d)
     # on calcule les fonctions objectifs pour chaque particule
     O = [particleToObjects(x) for x in Alea_P]
-    print(O)
 
     # on trie la population par groupes de dominance puis on "flatten" les groupes pour récupérer les individus de la classe A.
     P = sum(nonDominatedSet(Alea_P, O),[]) 
@@ -139,7 +138,7 @@ def MOTLBO():
     # on calcule les fonctions objectifs pour chaque particule
     O = [particleToObjects(discretise(x)) for x in P]
     
-    cou = 100
+    cou = 500
     P_p = popCopy(P)
     while not critereArret() and cou>0:
         #Teacher Phase
@@ -180,9 +179,9 @@ def MOTLBO():
                 P[i] = P_p[i]
                 O[i] = O_p[i]
     optimPlacement = sum(nonDominatedSet(P,O),[])
-    optimObjectif = [particleToObjects(discretise(x)) for x in P]
+    optimObjectif = [particleToObjects(discretise(x)) for x in optimPlacement]
  
-    return (optimPlacement[0],optimObjectif[0])   
+    return (discretise(optimPlacement[0]),optimObjectif[0])   
 
 
 print(MOTLBO())

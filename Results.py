@@ -6,7 +6,7 @@ import numpy as np
 
 mapWidth = 7000
 mapHeight= 6000
-nbVoitures = 500
+nbVoitures = 100
 
 #Initialisation des RSUs
 RSUs = []
@@ -55,7 +55,7 @@ def particleToObjects(vect):
 
 	# on calcule les 4 objectifs 
 	values = []
-	values.append(clockSync(RSUs, voitures))
+	#values.append(clockSync(RSUs, voitures))
 	values.append(nbControleurs(RSUs))
 	values.append(latency(RSUs, voitures))
 	values.append(equiCharge(RSUs, voitures))

@@ -97,7 +97,7 @@ def dominate(O_1, O_2):
 	dom = True
 	for i in range(len(O_1)):
 		# Vrai si l'individu idx_x_1 domine l'individu idx_x_2 selon l'objectif i, on veut minimiser l'objectif
-		dom = dom and (O_1[i] <= O_2[i])
+		dom = dom and (O_1[i] < O_2[i])
 	return dom
 
 # une fonction qui retourne la population triée par ordre de dominance, des individus non dominés entre eux appartiennent au même groupe au sein de la population.
@@ -158,7 +158,7 @@ def MOVBO():
 
 	next_P = [[x for x in particle] for particle in P] # la prochaine génération
 
-	nb_tour = 100
+	nb_tour = 30
 	while not critereArret() and nb_tour>0:
 		nb_tour -= 1
 
