@@ -142,7 +142,7 @@ def nonDominatedSet(X, objList):
 	return C
 	"""
 
-print(nonDominatedSet(generateRandomPop(50,10),[computeLatency]))
+#print(nonDominatedSet(generateRandomPop(50,10),[computeLatency]))
 
 #notre méta-heuristique customizée pour plusieurs objectifs
 def MOVBO():
@@ -154,7 +154,7 @@ def MOVBO():
 	alpha = 0.1 # proportion class A
 	Na = int(alpha*N) #nb d'individus dans la classe A
 	Alea_P = generateRandomPop(N,d)
-	P = np.array(nonDominatedSet(Alea_P,objList)).flatten() # on trie la population par groupes de dominance puis on "flatten" les groupes pour récupérer les individus de la classe A.
+	P = sum(nonDominatedSet(Alea_P,objList),[]) # on trie la population par groupes de dominance puis on "flatten" les groupes pour récupérer les individus de la classe A.
 	O = []
 	for i in range(len(objList)):
 		O.append([objList[i](x) for x in P])
@@ -193,7 +193,7 @@ def MOVBO():
 		# on recalcule les fonctions objectifs pour chaque nouvel individu de next_P
 		next_O = []
 		for i in range(len(objList)):
-			next_O.append([objList[i](x) for x in P_next])
+			next_O.append([objList[i](x) for x in next_P])
 
 		# on applique les maj de chaque individu uniquement sa nouvelle position domine l'ancienne
 		for i in range(N):
@@ -203,9 +203,11 @@ def MOVBO():
 					O[j][i] = next_O[j][i]
 
 		# et on trie de nouveau la population par ordre de dominance
-		P = np.array(nonDominatedSet(P,objList)).flatten()
+		P = sum(nonDominatedSet(P,objList),[])
 		for i in range(len(objList)):
 			O.append([objList[i](x) for x in P])
 
 	# si on a atteint le critère d'arrêt, on renvoie le meilleur individu et sa valeur
 	return P[0]
+
+print(MOVBO())
