@@ -10,7 +10,7 @@ def softmax(x):
 def generateRandomPop(N,d):
 	P = []
 	for i in range(N):
-		P.append(list((np.random.rand(d) > 0.5).astype(int)))
+		P.append(list(np.random.rand(d)))
 	return P
 
 # on dicretise le vecteur de flottant en vecteur de 0 ou 1
@@ -136,31 +136,30 @@ def nonDominatedSet(X, O):
 
 #print(nonDominatedSet(generateRandomPop(50,10),[computeLatency]))
 
-#notre méta-heuristique customizée pour plusieurs objectifs
+#notre méta-heuristique customisée pour plusieurs objectifs
 def MOVBO():
 
 	c1, c2 = 1.5, 1.25 #recommanded 
-	N = 10 # population size
+	N = 100 # population size
 	d = 24 # num of RSUs
 	alpha = 0.1 # proportion class A
 	Na = int(alpha*N) #nb d'individus dans la classe A
 	Alea_P = generateRandomPop(N,d) #on génère une population aléatoire
 
 	# on calcule les fonctions objectifs pour chaque particule
-	O = [particleToObjects(x) for x in Alea_P]
-	print(O)
+	O = [particleToObjects(discretise(x)) for x in Alea_P]
 
 	# on trie la population par groupes de dominance puis on "flatten" les groupes pour récupérer les individus de la classe A.
 	P = sum(nonDominatedSet(Alea_P, O),[]) 
 
 	# on calcule les fonctions objectifs pour chaque particule
-	O = [particleToObjects(x) for x in P]
+	O = [particleToObjects(discretise(x)) for x in P]
 
 	next_P = [[x for x in particle] for particle in P] # la prochaine génération
 
-	cou = 1000
-	while not critereArret() and cou>0:
-		cou -= 1
+	nb_tour = 30
+	while not critereArret() and nb_tour>0:
+		nb_tour -= 1
 
 		# on repère le meilleur et le pire individu
 		Xbest = P[0] 
@@ -204,7 +203,11 @@ def MOVBO():
 		O = [particleToObjects(discretise(x)) for x in P]
 
 	# si on a atteint le critère d'arrêt, on renvoie le meilleur individu et sa valeur
-	print(len(P[0]),len(O[0]))
-	return P[0], O[0]
 
-print(MOVBO())
+	l = len(nonDominatedSet(P, O)[0])
+	O = [particleToObjects(discretise(x)) for x in P]
+	print(l)
+	return P[:l],O[:]
+	#return P[0], O[0]
+
+MOVBO()
