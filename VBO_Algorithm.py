@@ -10,8 +10,12 @@ def softmax(x):
 def generateRandomPop(N,d):
 	P = []
 	for i in range(N):
-		P.append(np.random.rand(d))
+		P.append(list((np.random.rand(d) > 0.5).astype(int)))
 	return P
+
+# on dicretise le vecteur de flottant en vecteur de 0 ou 1
+def discretise(vect):
+	return [1 if x > 0.5 else 0 for x in vect ]
 
 def computeLatency(X):
 	c=0
@@ -135,30 +139,26 @@ def nonDominatedSet(X, O):
 #notre méta-heuristique customizée pour plusieurs objectifs
 def MOVBO():
 
-	objList = [computeLatency]
 	c1, c2 = 1.5, 1.25 #recommanded 
-	N = 100 # population size
+	N = 10 # population size
 	d = 24 # num of RSUs
 	alpha = 0.1 # proportion class A
 	Na = int(alpha*N) #nb d'individus dans la classe A
 	Alea_P = generateRandomPop(N,d) #on génère une population aléatoire
 
 	# on calcule les fonctions objectifs pour chaque particule
-	O = []
-	for i in range(len(Alea_P)):
-		O.append([particleToObjects(x) for x in Alea_P])
+	O = [particleToObjects(x) for x in Alea_P]
+	print(O)
 
 	# on trie la population par groupes de dominance puis on "flatten" les groupes pour récupérer les individus de la classe A.
 	P = sum(nonDominatedSet(Alea_P, O),[]) 
 
 	# on calcule les fonctions objectifs pour chaque particule
-	O = []
-	for i in range(len(P)):
-		O.append([particleToObjects(x) for x in P])
+	O = [particleToObjects(x) for x in P]
 
 	next_P = [[x for x in particle] for particle in P] # la prochaine génération
-	print("coucou")
-	cou = 1
+
+	cou = 1000
 	while not critereArret() and cou>0:
 		cou -= 1
 
@@ -189,9 +189,7 @@ def MOVBO():
 				next_P[i] = softmax(2 * rb * P[i])
 
 		# on recalcule les fonctions objectifs pour chaque nouvel individu de next_P
-		next_O = []
-		for i in range(len(next_P)):
-			next_O.append([particleToObjects(x) for x in next_P])
+		next_O = [particleToObjects(discretise(x)) for x in next_P]
 
 		# on applique les maj de chaque individu uniquement sa nouvelle position domine l'ancienne
 		for i in range(N):
@@ -203,11 +201,10 @@ def MOVBO():
 		P = sum(nonDominatedSet(P, O),[])
 		
 		# on calcule les fonctions objectifs pour chaque particule
-		O = []
-		for i in range(len(P)):
-			O.append([particleToObjects(x) for x in P])
+		O = [particleToObjects(discretise(x)) for x in P]
 
 	# si on a atteint le critère d'arrêt, on renvoie le meilleur individu et sa valeur
+	print(len(P[0]),len(O[0]))
 	return P[0], O[0]
 
 print(MOVBO())

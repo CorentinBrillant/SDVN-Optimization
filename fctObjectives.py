@@ -174,9 +174,12 @@ def equiCharge(rs, vs):
                 if j.isCont==0 and j.cAtr == rsu.id:
                     Z_i += j.novi
             Z.append(Z_i)
-    zmin = min(Z)
-    zmax = max(Z)
-    return beta * (zmax - zmin)
+    if len(Z) > 0:
+        zmin = min(Z)
+        zmax = max(Z)
+        return beta * (zmax - zmin)
+    else:
+        return 0
 
 
 #Tests
