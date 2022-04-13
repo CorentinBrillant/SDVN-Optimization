@@ -207,4 +207,4 @@ def MOVBO():
 
 	return [[discretise(x) for x in sub] for sub in nonDominatedSet(P, O)], [particleToObjects(discretise(x)) for x in P]
 
-print(MOVBO())
+#print(MOVBO())
