@@ -205,6 +205,6 @@ def MOVBO():
 
 	# si on a atteint le critère d'arrêt, on renvoie le meilleur individu et sa valeur
 
-	return discretise(P[0]), O[0]
+	return [discretise(x) for x in P], O
 
 print(MOVBO())
