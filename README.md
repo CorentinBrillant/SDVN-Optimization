@@ -4,3 +4,8 @@ Here, we tried to optimize the famous SDN problem which is a multi objectives pr
 ## Install
 
 In order to use this project, you'll need to install python 3. Once done, you'll have to install 2 libraries : _**matplotlib**_ and _**numpy**_
+
+To install required dependencies please enter the following command in the root folder of the project
+```
+pip install -r requirements.txt
+```
