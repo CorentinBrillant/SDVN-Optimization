@@ -9,3 +9,15 @@ To install required dependencies please enter the following command in the root 
 ```
 pip install -r requirements.txt
 ```
+
+## Launch
+
+Both metaheuristic algorithms TLBO and VBO are implemented in separated files _**TLBO.py**_ and _**VBO_Algorithm.py**_
+
+To Visualise the results, launch the script _**test.py**_
+```
+python test.py
+```
+
+As a result, you should see the non-dominated particles for each algorithm. It should look like below
+
