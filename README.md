@@ -22,5 +22,5 @@ python test.py
 As a result, you should see the non-dominated particles for each algorithm. It should look like below
 
 <p align="center">
-<img src="5.png" width="80%"/>
+<img src="5.PNG" width="80%"/>
  </p>
