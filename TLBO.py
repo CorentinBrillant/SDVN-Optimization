@@ -178,10 +178,12 @@ def MOTLBO():
             if(dominate(O_p[i],O[i])):
                 P[i] = P_p[i]
                 O[i] = O_p[i]
-    optimPlacement = sum(nonDominatedSet(P,O),[])
-    optimObjectif = [particleToObjects(discretise(x)) for x in optimPlacement]
+    optimPlacement = nonDominatedSet(P,O)
+    n = len(optimPlacement[0])
+    P = sum(optimPlacement,[])
+    optimObjectif = [particleToObjects(discretise(x)) for x in P[:n]]
  
-    return (discretise(optimPlacement[0]),optimObjectif[0])   
+    return ([discretise(x) for x in P],optimObjectif)   
 
 
-print(MOTLBO())
+#print(MOTLBO())

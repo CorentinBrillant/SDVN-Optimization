@@ -205,6 +205,6 @@ def MOVBO():
 
 	# si on a atteint le critère d'arrêt, on renvoie le meilleur individu et sa valeur
 
-	return [discretise(x) for x in P], O
+	return [[discretise(x) for x in sub] for sub in nonDominatedSet(P, O)], [particleToObjects(discretise(x)) for x in P]
 
 print(MOVBO())
